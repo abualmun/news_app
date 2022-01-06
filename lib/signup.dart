@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'custom.dart';
+import 'main.dart';
 
 class Signup extends StatefulWidget {
   @override
@@ -16,6 +17,7 @@ class _SignupState extends State<Signup> {
   TextEditingController _passwordController = TextEditingController();
   String _usernameError = "";
   String _passwordError = "dont use -,#,@,etc..";
+  final _pages = pages;
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +25,13 @@ class _SignupState extends State<Signup> {
       home: Scaffold(
         appBar: AppBar(
           title: Text("New App"),
-        ),
+        ),drawer: CustomDrawer(
+        backgroundColor: Colors.lightBlue,
+        itemsColor: Colors.grey,
+        titleColor: Colors.green,
+        pageName: 'Sign up',
+        pages: _pages,
+      ),
         body: Center(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,

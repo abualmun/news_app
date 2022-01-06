@@ -1,6 +1,9 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:news/main.dart';
+import 'package:news/requirer.dart';
+import 'package:http/http.dart' as http;
 
 Container textBox(String _text, TextEditingController _controller,
     String _error, bool _hideCharacters) {
@@ -38,7 +41,7 @@ Container textBox(String _text, TextEditingController _controller,
   );
 }
 
-ConstrainedBox bottomBar(TextEditingController _controller) {
+ConstrainedBox bottomBar(TextEditingController _controller, User user) {
   return ConstrainedBox(
     constraints: BoxConstraints(minHeight: 40),
     child: Wrap(children: [
@@ -63,10 +66,103 @@ ConstrainedBox bottomBar(TextEditingController _controller) {
               controller: _controller,
               decoration: InputDecoration(hintText: 'Yaburu Ai no Kokuhaku..'),
             )),
-            IconButton(onPressed: () {}, icon: Icon(Icons.send))
+            IconButton(
+                onPressed: () {
+                  if (user.loggedin) {}
+                },
+                icon: Icon(Icons.send))
           ],
         ),
       ),
     ]),
   );
+}
+
+class CustomDrawer extends Drawer {
+  final Color backgroundColor;
+  final Color itemsColor;
+  final Color titleColor;
+  final String pageName;
+  final List<PageDetails> pages;
+
+  CustomDrawer(
+      {this.backgroundColor,
+      this.itemsColor,
+      this.titleColor,
+      this.pages,
+      this.pageName}) {
+    for (var item in pages) {
+      if (item.name == pageName) {
+        this.pages.removeWhere((element) => element.name == item.name);
+        this.pages.insert(0, item);
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Drawer(
+      backgroundColor: this.backgroundColor,
+      child: ListView.builder(
+          itemCount: pages.length,
+          itemBuilder: (context, index) {
+            return GestureDetector(
+              onTap: () {
+                if (index > 0) Navigator.pushNamed(context, pages[index].path);
+              },
+              child: Container(
+                margin: EdgeInsets.fromLTRB(4, 4, 4, 4),
+                alignment: Alignment.center,
+                child: Text(
+                  pages[index].name,
+                  style: TextStyle(fontSize: (index == 0) ? 34 : 24),
+                ),
+                height: (index == 0) ? 56 : 48,
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(5),
+                    color: (index == 0) ? titleColor : itemsColor),
+              ),
+            );
+          }),
+    );
+  }
+}
+
+class PostCard extends Container {
+  final Post _post;
+
+  PostCard(this._post);
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      direction: Axis.vertical,
+      crossAxisAlignment: WrapCrossAlignment.end,
+      children: [
+        Container(
+          padding: EdgeInsets.all(4),
+          margin: EdgeInsets.all(4),
+          decoration: BoxDecoration(
+              color: Colors.grey, borderRadius: BorderRadius.circular(5)),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                _post.author,
+                style: TextStyle(
+                    fontWeight: FontWeight.bold, color: Colors.green[150]),
+              ),
+              SizedBox(height: 8,),
+              Text(_post.content),
+            ],
+          ),
+        ),
+        Container(
+          child: Text(_post.date),
+          height: 16,
+          alignment: Alignment.bottomRight,
+        )
+      ],
+    );
+  }
 }
