@@ -1,11 +1,9 @@
-
-
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'custom.dart';
 import 'main.dart';
+import 'requirer.dart';
 
 class Signup extends StatefulWidget {
   @override
@@ -25,13 +23,14 @@ class _SignupState extends State<Signup> {
       home: Scaffold(
         appBar: AppBar(
           title: Text("New App"),
-        ),drawer: CustomDrawer(
-        backgroundColor: Colors.lightBlue,
-        itemsColor: Colors.grey,
-        titleColor: Colors.green,
-        pageName: 'Sign up',
-        pages: _pages,
-      ),
+        ),
+        drawer: CustomDrawer(
+          backgroundColor: Colors.lightBlue,
+          itemsColor: Colors.grey,
+          titleColor: Colors.green,
+          pageName: 'Sign up',
+          pages: _pages,
+        ),
         body: Center(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -57,13 +56,15 @@ class _SignupState extends State<Signup> {
                 height: 64,
               ),
               ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
                     if (_usernameController.text.isNotEmpty &&
                         _passwordController.text.length >= 8) {
-                      print('username: ${_usernameController.text}' +
-                          '\n' +
-                          'Password : ${_passwordController.text}');
+                      final validSignup = await trySignup(
+                          _usernameController.text, _passwordController.text);
 
+                      if (validSignup) {
+                        Navigator.popAndPushNamed(context, '/login');
+                      }
                       setState(() {
                         _usernameError = "";
                         _passwordError = "dont use -,#,@,etc..";

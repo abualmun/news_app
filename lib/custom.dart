@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:news/main.dart';
 import 'package:news/requirer.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 
 Container textBox(String _text, TextEditingController _controller,
     String _error, bool _hideCharacters) {
@@ -41,7 +42,8 @@ Container textBox(String _text, TextEditingController _controller,
   );
 }
 
-ConstrainedBox bottomBar(TextEditingController _controller, User user) {
+ConstrainedBox bottomBar(
+    TextEditingController _controller, User user, Function refresh) {
   return ConstrainedBox(
     constraints: BoxConstraints(minHeight: 40),
     child: Wrap(children: [
@@ -67,8 +69,20 @@ ConstrainedBox bottomBar(TextEditingController _controller, User user) {
               decoration: InputDecoration(hintText: 'Yaburu Ai no Kokuhaku..'),
             )),
             IconButton(
-                onPressed: () {
-                  if (user.loggedin) {}
+                onPressed: () async {
+                  if (user.loggedin) {
+                    final Post post = Post(
+                        id: chat[chat.length - 1].id,
+                        author: user.username,
+                        content: _controller.text,
+                        date:
+                            DateFormat.jm().format(DateTime.now()).toString());
+                    _controller.text = '';
+                    final List<Post> newPosts =
+                        await sendPost(http.Client(), post);
+
+                    refresh(newPosts);
+                  }
                 },
                 icon: Icon(Icons.send))
           ],
@@ -108,7 +122,8 @@ class CustomDrawer extends Drawer {
           itemBuilder: (context, index) {
             return GestureDetector(
               onTap: () {
-                if (index > 0) Navigator.pushNamed(context, pages[index].path);
+                if (index > 0)
+                  Navigator.popAndPushNamed(context, pages[index].path);
               },
               child: Container(
                 margin: EdgeInsets.fromLTRB(4, 4, 4, 4),
@@ -152,7 +167,9 @@ class PostCard extends Container {
                 style: TextStyle(
                     fontWeight: FontWeight.bold, color: Colors.green[150]),
               ),
-              SizedBox(height: 8,),
+              SizedBox(
+                height: 8,
+              ),
               Text(_post.content),
             ],
           ),

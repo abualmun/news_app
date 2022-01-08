@@ -9,10 +9,8 @@ import 'login.dart';
 import 'requirer.dart';
 
 void main() {
-  // chat.add(Post('author', 'content', 'date'));
-
   runApp(MaterialApp(
-    initialRoute: '/',
+    initialRoute: '/signup',
     routes: {
       '/': (context) => Home(),
       '/login': (context) => Login(),
@@ -21,11 +19,16 @@ void main() {
   ));
 }
 
+List<Post> chat = [
+  Post(id: 0, author: 'ana', content: 'halo', date: '6.02 PM')
+];
 List<PageDetails> pages = [
   PageDetails('Home', '/'),
   PageDetails('Log in', '/login'),
   PageDetails('Sign up', '/signup')
 ];
+
+var user = User('', '', false);
 
 class Home extends StatefulWidget {
   @override
@@ -33,18 +36,40 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  var user = User('', '', true);
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    startingChat();
+    // });
+  }
+
+  startingChat() async {
+    final List<Post> newPosts = await fetchPosts(http.Client(), chat[0].id);
+    refresh(newPosts);
+  }
+
   final _pages = pages;
 
   var _textController = TextEditingController();
 
-  List<Post> chat = [
-    Post('author', 'content', 'date'),
-    Post('abualmun', 'shabissssssssssssssssssssssssssdabido \n hhh', '2022')
-  ];
+  refresh(List<Post> posts) {
+    setState(() {
+      chat.addAll(posts);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () async {
+      //     final List<Post> newPosts =
+      //         await fetchPosts(http.Client(), chat[0].id);
+      //     refresh(newPosts);
+      //   },
+      // ),
       appBar: AppBar(),
       drawer: CustomDrawer(
         backgroundColor: Colors.lightBlue,
@@ -57,12 +82,14 @@ class _HomeState extends State<Home> {
         ListView.builder(
           itemCount: chat.length,
           itemBuilder: (context, index) {
-            return PostCard(chat[index]);
+            final rIndex = chat.length - index - 1;
+
+            return PostCard(chat[rIndex]);
           },
         ),
         Align(
           alignment: Alignment.bottomCenter,
-          child: bottomBar(_textController, user),
+          child: bottomBar(_textController, user, refresh),
         ),
       ]),
     );

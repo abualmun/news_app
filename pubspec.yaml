@@ -26,6 +26,7 @@ dependencies:
   sqflite:
   path:
   http:
+  intl: ^0.17.0
   
   
 

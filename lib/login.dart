@@ -24,13 +24,13 @@ class _LoginState extends State<Login> {
         appBar: AppBar(
           title: Text("New App"),
         ),
-        drawer:CustomDrawer(
-        backgroundColor: Colors.lightBlue,
-        itemsColor: Colors.grey,
-        titleColor: Colors.green,
-        pageName: 'Log in',
-        pages: _pages,
-      ) ,
+        drawer: CustomDrawer(
+          backgroundColor: Colors.lightBlue,
+          itemsColor: Colors.grey,
+          titleColor: Colors.green,
+          pageName: 'Log in',
+          pages: _pages,
+        ),
         body: Center(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -62,10 +62,9 @@ class _LoginState extends State<Login> {
                       final validLogin = await tryLogin(
                           _usernameController.text, _passwordController.text);
                       if (validLogin) {
-                        print('username: ${_usernameController.text}' +
-                            '\n' +
-                            'Password : ${_passwordController.text}');
-
+                        user = User(_usernameController.text,
+                            _passwordController.text, true);
+                        Navigator.popAndPushNamed(context,'/');
                         setState(() {
                           _usernameError = "";
                           _passwordError = "";
