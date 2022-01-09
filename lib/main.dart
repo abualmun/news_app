@@ -10,9 +10,9 @@ import 'requirer.dart';
 
 void main() {
   runApp(MaterialApp(
-    initialRoute: '/signup',
+    initialRoute: '/login',
     routes: {
-      '/': (context) => Home(),
+      '/chat': (context) => Home(),
       '/login': (context) => Login(),
       '/signup': (context) => Signup()
     },
@@ -36,23 +36,20 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    // WidgetsBinding.instance.addPostFrameCallback((_) {
-    startingChat();
-    // });
-  }
+
 
   startingChat() async {
-    final List<Post> newPosts = await fetchPosts(http.Client(), chat[0].id);
+    final List<Post> newPosts = await fetchPosts(http.Client(), chat.last.id);
     refresh(newPosts);
   }
 
-  final _pages = pages;
-
+  bool _loading = false;
   var _textController = TextEditingController();
+  void changeLoadingValue() {
+    setState(() {
+      _loading = !_loading;
+    });
+  }
 
   refresh(List<Post> posts) {
     setState(() {
@@ -63,34 +60,56 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: () async {
-      //     final List<Post> newPosts =
-      //         await fetchPosts(http.Client(), chat[0].id);
-      //     refresh(newPosts);
-      //   },
-      // ),
-      appBar: AppBar(),
-      drawer: CustomDrawer(
-        backgroundColor: Colors.lightBlue,
-        itemsColor: Colors.grey,
-        titleColor: Colors.green,
-        pageName: 'Home',
-        pages: _pages,
+      appBar: AppBar(
+        leading: IconButton(
+          onPressed: () async {
+            setState(() {
+              _loading = true;
+            });
+            final List<Post> newPosts =
+                await fetchPosts(http.Client(), chat.last.id);
+            refresh(newPosts);
+            setState(() {
+              _loading = false;
+            });
+          },
+          icon: Icon(Icons.refresh),
+        ),
       ),
       body: Stack(children: [
         ListView.builder(
+          padding: EdgeInsets.only(bottom: 64),
           itemCount: chat.length,
           itemBuilder: (context, index) {
             final rIndex = chat.length - index - 1;
 
-            return PostCard(chat[rIndex]);
+            return (user.username == chat[rIndex].author)
+                ? Align(
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 8.0),
+                      child: PostCard(chat[rIndex]),
+                    ),
+                    alignment: Alignment.centerRight,
+                  )
+                : Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: PostCard(chat[rIndex]),
+                  );
           },
         ),
         Align(
           alignment: Alignment.bottomCenter,
-          child: bottomBar(_textController, user, refresh),
+          child: bottomBar(_textController, user, refresh, changeLoadingValue),
         ),
+        if (_loading)
+          Opacity(
+              opacity: .2,
+              child: Container(
+                height: double.infinity,
+                width: double.infinity,
+                color: Colors.grey,
+              )),
+        if (_loading) Center(child: CircularProgressIndicator())
       ]),
     );
   }

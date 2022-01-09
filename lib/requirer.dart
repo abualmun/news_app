@@ -81,21 +81,32 @@ Future<List<Post>> sendPost(http.Client client, Post post) async {
   return compute(parsePosts, response.body);
 }
 
-Future<bool> tryLogin(String username, String password) async {
-  final response =
-      await http.Client().post(Uri.parse('https://abualmun-news-api.herokuapp.com/users/login'),
-          headers: <String, String>{
-            'Content-Type': 'application/json; charset=UTF-8',
-          },
-          body: json.encode({'username': username, 'password': password}));
-  return response.body == 'success';
+Future<String> tryLogin(String username, String password) async {
+  try {
+    final response = await http.Client()
+        .post(Uri.parse('https://abualmun-news-api.herokuapp.com/users/login'),
+            headers: <String, String>{
+              'Content-Type': 'application/json; charset=UTF-8',
+            },
+            body: json.encode({'username': username, 'password': password}));
+    if (response.statusCode == 200) return response.body;
+} catch (err) {
+    return 'connection problem';
+  }
+
+ 
 }
-Future<bool> trySignup(String username, String password) async {
-  final response = await http.Client()
+
+Future<String> trySignup(String username, String password) async {
+  try{final response = await http.Client()
       .post(Uri.parse('https://abualmun-news-api.herokuapp.com/users'),
           headers: <String, String>{
             'Content-Type': 'application/json; charset=UTF-8',
           },
           body: json.encode({'username': username, 'password': password}));
-  return response.body == 'success';
+     if (response.statusCode == 200) return response.body;
+} catch (err) {
+    return 'connection problem';
+  }
+
 }

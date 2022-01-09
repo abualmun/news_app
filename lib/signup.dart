@@ -15,23 +15,15 @@ class _SignupState extends State<Signup> {
   TextEditingController _passwordController = TextEditingController();
   String _usernameError = "";
   String _passwordError = "dont use -,#,@,etc..";
-  final _pages = pages;
-
+  bool _loading = false;
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: Text("New App"),
-        ),
-        drawer: CustomDrawer(
-          backgroundColor: Colors.lightBlue,
-          itemsColor: Colors.grey,
-          titleColor: Colors.green,
-          pageName: 'Sign up',
-          pages: _pages,
-        ),
-        body: Center(
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("New App"),
+      ),
+      body: Stack(children: [
+        Center(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
@@ -55,35 +47,64 @@ class _SignupState extends State<Signup> {
               SizedBox(
                 height: 64,
               ),
-              ElevatedButton(
-                  onPressed: () async {
-                    if (_usernameController.text.isNotEmpty &&
-                        _passwordController.text.length >= 8) {
-                      final validSignup = await trySignup(
-                          _usernameController.text, _passwordController.text);
-
-                      if (validSignup) {
-                        Navigator.popAndPushNamed(context, '/login');
-                      }
-                      setState(() {
-                        _usernameError = "";
-                        _passwordError = "dont use -,#,@,etc..";
-                      });
-                    } else if (_usernameController.text.isEmpty) {
-                      setState(() {
-                        _usernameError = "Enter a username!";
-                      });
-                    } else if (_passwordController.text.length <= 8) {
-                      setState(() {
-                        _passwordError = "Password too short!";
-                      });
-                    }
-                  },
-                  child: Text('Sign up'))
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                      onPressed: () async {
+                        if (_usernameController.text.isNotEmpty &&
+                            _passwordController.text.length >= 8) {
+                          setState(() {
+                            _loading = true;
+                          });
+                          final validSignup = await trySignup(
+                              _usernameController.text,
+                              _passwordController.text);
+                          setState(() {
+                            _loading = false;
+                          });
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(validSignup)));
+                          if (validSignup == 'success') {
+                            Navigator.popAndPushNamed(context, '/login');
+                          }
+                          setState(() {
+                            _usernameError = "";
+                            _passwordError = "dont use -,#,@,etc..";
+                          });
+                        } else if (_usernameController.text.isEmpty) {
+                          setState(() {
+                            _usernameError = "Enter a username!";
+                          });
+                        } else if (_passwordController.text.length <= 8) {
+                          setState(() {
+                            _passwordError = "Password too short!";
+                          });
+                        }
+                      },
+                      child: Text('Sign up')),
+                  SizedBox(
+                    width: 16,
+                  ),
+                  ElevatedButton(
+                      onPressed: () =>
+                          Navigator.popAndPushNamed(context, '/login'),
+                      child: Text('go to Log in page'))
+                ],
+              )
             ],
           ),
         ),
-      ),
+        if (_loading)
+          Opacity(
+              opacity: .2,
+              child: Container(
+                height: double.infinity,
+                width: double.infinity,
+                color: Colors.grey,
+              )),
+        if (_loading) Center(child: CircularProgressIndicator())
+      ]),
     );
   }
 }

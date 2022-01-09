@@ -42,8 +42,8 @@ Container textBox(String _text, TextEditingController _controller,
   );
 }
 
-ConstrainedBox bottomBar(
-    TextEditingController _controller, User user, Function refresh) {
+ConstrainedBox bottomBar(TextEditingController _controller, User user,
+    Function refresh, Function loading) {
   return ConstrainedBox(
     constraints: BoxConstraints(minHeight: 40),
     child: Wrap(children: [
@@ -71,16 +71,18 @@ ConstrainedBox bottomBar(
             IconButton(
                 onPressed: () async {
                   if (user.loggedin) {
+                    loading();
                     final Post post = Post(
-                        id: chat[chat.length - 1].id,
+                        id: chat.last.id,
                         author: user.username,
                         content: _controller.text,
                         date:
                             DateFormat.jm().format(DateTime.now()).toString());
+
                     _controller.text = '';
                     final List<Post> newPosts =
                         await sendPost(http.Client(), post);
-
+                    loading();
                     refresh(newPosts);
                   }
                 },
