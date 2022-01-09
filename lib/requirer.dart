@@ -64,8 +64,7 @@ Future<List<Post>> fetchPosts(http.Client client, int lastid) async {
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
-      body: json.encode({'id': '1'}));
-  print(parsePosts(response.body));
+      body: json.encode({'id': lastid}));
 
   return parsePosts(response.body);
 }

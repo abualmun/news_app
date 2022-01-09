@@ -22,11 +22,6 @@ void main() {
 List<Post> chat = [
   Post(id: 0, author: 'ana', content: 'halo', date: '6.02 PM')
 ];
-List<PageDetails> pages = [
-  PageDetails('Home', '/'),
-  PageDetails('Log in', '/login'),
-  PageDetails('Sign up', '/signup')
-];
 
 var user = User('', '', false);
 
@@ -36,7 +31,12 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  @override
+  void initState() {
+    startingChat();
 
+    super.initState();
+  }
 
   startingChat() async {
     final List<Post> newPosts = await fetchPosts(http.Client(), chat.last.id);
@@ -68,6 +68,8 @@ class _HomeState extends State<Home> {
             });
             final List<Post> newPosts =
                 await fetchPosts(http.Client(), chat.last.id);
+                    print(chat.map((e) => e.id).toList());
+
             refresh(newPosts);
             setState(() {
               _loading = false;
