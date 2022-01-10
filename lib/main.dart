@@ -1,7 +1,5 @@
 import 'package:http/http.dart' as http;
-import 'package:http/http.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:news/custom.dart';
 import 'package:news/requirer.dart';
 import 'package:news/signup.dart';
@@ -18,11 +16,11 @@ void main() {
     },
   ));
 }
-
+// this is where you store the required "Posts" from the API
 List<Post> chat = [
-  Post(id: 0, author: 'ana', content: 'halo', date: '6.02 PM')
-];
+  Post(id: 0, author: 'ana', content: 'halo', date: '6.02 PM')];
 
+// this is where you store the user information
 var user = User('', '', false);
 
 class Home extends StatefulWidget {
@@ -31,21 +29,30 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  // loading is variable to hide/show the loading icon
+  bool _loading = false;
+  var _textController = TextEditingController();
+  
+  
   @override
   void initState() {
     startingChat();
-
     super.initState();
   }
 
   startingChat() async {
+    setState(() {
+      _loading = true;
+    });
     final List<Post> newPosts = await fetchPosts(http.Client(), chat.last.id);
+    setState(() {
+      _loading = false;
+    });
     refresh(newPosts);
   }
 
-  bool _loading = false;
-  var _textController = TextEditingController();
-  void changeLoadingValue() {
+ 
+  void loadingIcon() {
     setState(() {
       _loading = !_loading;
     });
@@ -68,7 +75,7 @@ class _HomeState extends State<Home> {
             });
             final List<Post> newPosts =
                 await fetchPosts(http.Client(), chat.last.id);
-                    print(chat.map((e) => e.id).toList());
+            print(chat.map((e) => e.id).toList());
 
             refresh(newPosts);
             setState(() {
@@ -101,7 +108,7 @@ class _HomeState extends State<Home> {
         ),
         Align(
           alignment: Alignment.bottomCenter,
-          child: bottomBar(_textController, user, refresh, changeLoadingValue),
+          child: bottomBar(_textController, user, refresh, loadingIcon),
         ),
         if (_loading)
           Opacity(

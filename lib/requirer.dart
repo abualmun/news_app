@@ -1,18 +1,7 @@
 import 'dart:convert';
-
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'package:news/main.dart';
-import 'package:path/path.dart';
-import 'package:sqflite/sqflite.dart';
 import 'package:http/http.dart' as http;
 
-class PageDetails {
-  final String name;
-  final String path;
-
-  PageDetails(this.name, this.path);
-}
 
 class User {
   final String username;

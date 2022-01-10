@@ -1,5 +1,4 @@
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:news/main.dart';
 import 'package:news/requirer.dart';
@@ -66,7 +65,7 @@ ConstrainedBox bottomBar(TextEditingController _controller, User user,
               maxLines: null,
               minLines: null,
               controller: _controller,
-              decoration: InputDecoration(hintText: 'Yaburu Ai no Kokuhaku..'),
+              decoration: InputDecoration(hintText: '..سل ما بدا لك'),
             )),
             IconButton(
                 onPressed: () async {
@@ -94,56 +93,6 @@ ConstrainedBox bottomBar(TextEditingController _controller, User user,
   );
 }
 
-class CustomDrawer extends Drawer {
-  final Color backgroundColor;
-  final Color itemsColor;
-  final Color titleColor;
-  final String pageName;
-  final List<PageDetails> pages;
-
-  CustomDrawer(
-      {this.backgroundColor,
-      this.itemsColor,
-      this.titleColor,
-      this.pages,
-      this.pageName}) {
-    for (var item in pages) {
-      if (item.name == pageName) {
-        this.pages.removeWhere((element) => element.name == item.name);
-        this.pages.insert(0, item);
-      }
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Drawer(
-      backgroundColor: this.backgroundColor,
-      child: ListView.builder(
-          itemCount: pages.length,
-          itemBuilder: (context, index) {
-            return GestureDetector(
-              onTap: () {
-                if (index > 0)
-                  Navigator.popAndPushNamed(context, pages[index].path);
-              },
-              child: Container(
-                margin: EdgeInsets.fromLTRB(4, 4, 4, 4),
-                alignment: Alignment.center,
-                child: Text(
-                  pages[index].name,
-                  style: TextStyle(fontSize: (index == 0) ? 34 : 24),
-                ),
-                height: (index == 0) ? 56 : 48,
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(5),
-                    color: (index == 0) ? titleColor : itemsColor),
-              ),
-            );
-          }),
-    );
-  }
-}
 
 class PostCard extends Container {
   final Post _post;

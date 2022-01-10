@@ -1,8 +1,5 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
 import 'custom.dart';
-import 'main.dart';
 import 'requirer.dart';
 
 class Signup extends StatefulWidget {
@@ -15,6 +12,7 @@ class _SignupState extends State<Signup> {
   TextEditingController _passwordController = TextEditingController();
   String _usernameError = "";
   String _passwordError = "dont use -,#,@,etc..";
+   // loading is variable to hide/show the loading icon
   bool _loading = false;
   @override
   Widget build(BuildContext context) {
@@ -70,7 +68,7 @@ class _SignupState extends State<Signup> {
                           }
                           setState(() {
                             _usernameError = "";
-                            _passwordError = "dont use -,#,@,etc..";
+                            _passwordError = "";
                           });
                         } else if (_usernameController.text.isEmpty) {
                           setState(() {
@@ -78,7 +76,8 @@ class _SignupState extends State<Signup> {
                           });
                         } else if (_passwordController.text.length <= 8) {
                           setState(() {
-                            _passwordError = "Password too short!";
+                            _passwordError =
+                                "Password too short!..min 8 chatacters.";
                           });
                         }
                       },

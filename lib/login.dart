@@ -1,6 +1,4 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:news/requirer.dart';
 import 'custom.dart';
 import 'main.dart';
@@ -15,6 +13,7 @@ class _LoginState extends State<Login> {
   TextEditingController _passwordController = TextEditingController();
   String _usernameError = "";
   String _passwordError = "";
+    // loading is variable to hide/show the loading icon
   bool _loading = false;
   @override
   Widget build(BuildContext context) {
