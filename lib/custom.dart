@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:news/main.dart';
@@ -41,8 +42,7 @@ Container textBox(String _text, TextEditingController _controller,
   );
 }
 
-ConstrainedBox bottomBar(TextEditingController _controller, User user,
-    Function refresh, Function loading) {
+ConstrainedBox bottomBar(TextEditingController _controller, User user) {
   return ConstrainedBox(
     constraints: BoxConstraints(minHeight: 40),
     child: Wrap(children: [
@@ -70,7 +70,6 @@ ConstrainedBox bottomBar(TextEditingController _controller, User user,
             IconButton(
                 onPressed: () async {
                   if (user.loggedin) {
-                    loading();
                     final Post post = Post(
                         id: chat.last.id,
                         author: user.username,
@@ -79,10 +78,8 @@ ConstrainedBox bottomBar(TextEditingController _controller, User user,
                             DateFormat.jm().format(DateTime.now()).toString());
 
                     _controller.text = '';
-                    final List<Post> newPosts =
-                        await sendPost(http.Client(), post);
-                    loading();
-                    refresh(newPosts);
+                    socket.emit('post', (json.encode(post.toMap())));
+                    
                   }
                 },
                 icon: Icon(Icons.send))
@@ -92,7 +89,6 @@ ConstrainedBox bottomBar(TextEditingController _controller, User user,
     ]),
   );
 }
-
 
 class PostCard extends Container {
   final Post _post;

@@ -1,7 +1,11 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
-
+import 'package:socket_io_client/socket_io_client.dart';
+    final socket = io("http://192.168.43.159:5000", <String, dynamic>{
+  "transports": ["websocket"],
+  "autoConnect": false,
+});
 
 class User {
   final String username;
@@ -42,59 +46,36 @@ class Post {
   }
 }
 
-List<Post> parsePosts(String responseBody) {
-  final parsed = jsonDecode(responseBody).cast<Map<String, dynamic>>();
-  return parsed.map<Post>((json) => Post.fromJson(json)).toList();
+List<Post> parsePosts(responseBody) {
+  return responseBody.map<Post>((json) => Post.fromJson(json)).toList();
 }
 
-Future<List<Post>> fetchPosts(http.Client client, int lastid) async {
-  final response = await client.post(
-      Uri.parse('https://abualmun-news-api.herokuapp.com/chat'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: json.encode({'id': lastid}));
 
-  return parsePosts(response.body);
-}
-
-Future<List<Post>> sendPost(http.Client client, Post post) async {
-  final response = await client.post(
-      Uri.parse('https://abualmun-news-api.herokuapp.com/chat/post'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: json.encode(post.toMap()));
-
-  return compute(parsePosts, response.body);
-}
 
 Future<String> tryLogin(String username, String password) async {
   try {
     final response = await http.Client()
-        .post(Uri.parse('https://abualmun-news-api.herokuapp.com/users/login'),
+        .post(Uri.parse('http://192.168.43.159:5000/users/login'),
             headers: <String, String>{
               'Content-Type': 'application/json; charset=UTF-8',
             },
             body: json.encode({'username': username, 'password': password}));
     if (response.statusCode == 200) return response.body;
-} catch (err) {
+  } catch (err) {
     return 'connection problem';
   }
-
- 
 }
 
 Future<String> trySignup(String username, String password) async {
-  try{final response = await http.Client()
-      .post(Uri.parse('https://abualmun-news-api.herokuapp.com/users'),
-          headers: <String, String>{
-            'Content-Type': 'application/json; charset=UTF-8',
-          },
-          body: json.encode({'username': username, 'password': password}));
-     if (response.statusCode == 200) return response.body;
-} catch (err) {
+  try {
+    final response = await http.Client()
+        .post(Uri.parse('http://192.168.43.159:5000/users'),
+            headers: <String, String>{
+              'Content-Type': 'application/json; charset=UTF-8',
+            },
+            body: json.encode({'username': username, 'password': password}));
+    if (response.statusCode == 200) return response.body;
+  } catch (err) {
     return 'connection problem';
   }
-
 }

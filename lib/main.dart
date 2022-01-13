@@ -1,10 +1,14 @@
+import 'dart:convert';
+
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:news/custom.dart';
 import 'package:news/requirer.dart';
 import 'package:news/signup.dart';
+import 'package:socket_io_client/socket_io_client.dart';
 import 'login.dart';
 import 'requirer.dart';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 void main() {
   runApp(MaterialApp(
@@ -16,9 +20,11 @@ void main() {
     },
   ));
 }
+
 // this is where you store the required "Posts" from the API
 List<Post> chat = [
-  Post(id: 0, author: 'ana', content: 'halo', date: '6.02 PM')];
+  Post(id: 0, author: 'ana', content: 'halo', date: '6.02 PM')
+];
 
 // this is where you store the user information
 var user = User('', '', false);
@@ -32,58 +38,32 @@ class _HomeState extends State<Home> {
   // loading is variable to hide/show the loading icon
   bool _loading = false;
   var _textController = TextEditingController();
-  
-  
+
   @override
   void initState() {
-    startingChat();
     super.initState();
+    socketConnection();
   }
 
-  startingChat() async {
-    setState(() {
-      _loading = true;
-    });
-    final List<Post> newPosts = await fetchPosts(http.Client(), chat.last.id);
-    setState(() {
-      _loading = false;
-    });
-    refresh(newPosts);
-  }
+  void socketConnection() {
+    socket.connect();
+    socket.on('connection', (data) => {setState((){chat.addAll(parsePosts(data));})});
 
- 
-  void loadingIcon() {
-    setState(() {
-      _loading = !_loading;
-    });
-  }
-
-  refresh(List<Post> posts) {
-    setState(() {
-      chat.addAll(posts);
-    });
+    socket.on(
+        'post',
+        (data) => {
+              print(chat.length),
+              setState(() {
+                chat.add(Post.fromJson(json.decode(data)));
+              })
+            });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          onPressed: () async {
-            setState(() {
-              _loading = true;
-            });
-            final List<Post> newPosts =
-                await fetchPosts(http.Client(), chat.last.id);
-            print(chat.map((e) => e.id).toList());
-
-            refresh(newPosts);
-            setState(() {
-              _loading = false;
-            });
-          },
-          icon: Icon(Icons.refresh),
-        ),
+        title: Text('No refresh any more! '),
       ),
       body: Stack(children: [
         ListView.builder(
@@ -108,7 +88,7 @@ class _HomeState extends State<Home> {
         ),
         Align(
           alignment: Alignment.bottomCenter,
-          child: bottomBar(_textController, user, refresh, loadingIcon),
+          child: bottomBar(_textController, user),
         ),
         if (_loading)
           Opacity(
